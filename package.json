@@ -1,7 +1,7 @@
 {
   "name": "evicting-cache",
   "author": "D1g1talEntr0py",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "license": "ISC",
   "description": "Cache implementation with an LRU evicting policy",
   "type": "module",
