@@ -1,42 +1,34 @@
-import LinkedMap from '@d1g1tal/collections/dist/linked-map.js';
+import { LinkedMap } from '@d1g1tal/collections/src';
 
-/**
- * JavaScript implementation of a Least Recently Used(LRU) Cache using a doubly linked list.
- *
- * @template K
- * @template V
- * @type {EvictingCache<K, V>}
- */
-export default class EvictingCache {
-	/** @type {number} */
-	#capacity;
-	/** @type {LinkedMap<K, V>} */
-	#cache;
+/** JavaScript implementation of a Least Recently Used(LRU) Cache using a doubly linked list. */
+export class EvictingCache<K, V> {
+	private readonly $capacity: number;
+	private readonly cache: LinkedMap<K, V>;
 
 	/**
 	 * Creates a new Evicting Cache with the given capacity.
 	 *
 	 * @param {number} [capacity=100] The maximum number of key-value pairs the cache can hold.
 	 */
-	constructor(capacity = 100) {
+	constructor(capacity: number = 100) {
 		if (capacity < 1) { throw new RangeError('capacity must be greater than 0') }
 		if (!Number.isInteger(capacity)) { throw new RangeError('capacity must be an integer') }
 
-		this.#capacity = capacity;
-		this.#cache = new LinkedMap();
+		this.$capacity = capacity;
+		this.cache = new LinkedMap();
 	}
 
 	/**
 	 * Returns the value associated with the given key from the cache and updates the LRU order.
 	 *
 	 * @param {K} key The key to get the value for.
-	 * @returns {V|null} The associated value if the key is in the cache, or null otherwise.
+	 * @returns {V | null} The associated value if the key is in the cache, or null otherwise.
 	 */
-	get(key) {
-		const value = this.#cache.get(key);
+	get(key: K): V | null {
+		const value = this.cache.get(key);
 		if (!value) { return null }
 
-		this.#cache.moveToFirst(key);
+		this.cache.moveToFirst(key);
 
 		return value;
 	}
@@ -47,8 +39,8 @@ export default class EvictingCache {
 	 * @param {K} key The key to check.
 	 * @returns {boolean} True if the key is in the cache, false otherwise.
 	 */
-	has(key) {
-		return this.#cache.has(key);
+	has(key: K): boolean {
+		return this.cache.has(key);
 	}
 
 	/**
@@ -59,8 +51,8 @@ export default class EvictingCache {
 	 * @param {V} value The value to add.
 	 * @returns {void}
 	 */
-	put(key, value) {
-		this.#put(key, value);
+	put(key: K, value: V): void {
+		this.putAndEvict(key, value);
 	}
 
 	/**
@@ -69,8 +61,8 @@ export default class EvictingCache {
 	 * @param {function(): V} producer The value to put if the key does not exist in the cache.
 	 * @returns {V} The value corresponding to the key.
 	 */
-	getOrPut(key, producer) {
-		return this.get(key) ?? this.#put(key, producer());
+	getOrPut(key: K, producer: () => V): V {
+		return this.get(key) ?? this.putAndEvict(key, producer());
 	}
 
 	/**
@@ -78,8 +70,8 @@ export default class EvictingCache {
 	 *
 	 * @returns {boolean} True if an item was removed, false otherwise.
 	 */
-	evict() {
-		return this.#cache.size ? this.#cache.removeLast() : false;
+	evict(): boolean {
+		return this.cache.size ? this.cache.removeLast() : false;
 	}
 
 	/**
@@ -87,8 +79,8 @@ export default class EvictingCache {
 	 *
 	 * @returns {void}
 	 */
-	clear() {
-		this.#cache.clear();
+	clear(): void {
+		this.cache.clear();
 	}
 
 	/**
@@ -99,8 +91,8 @@ export default class EvictingCache {
 	 * @readonly
 	 * @returns {number} The capacity of the cache.
 	 */
-	get capacity() {
-		return this.#capacity;
+	get capacity(): number {
+		return this.$capacity;
 	}
 
 	/**
@@ -113,8 +105,8 @@ export default class EvictingCache {
 	 *
 	 * @returns {number} The size of the cache.
 	 */
-	get size() {
-		return this.#cache.size;
+	get size(): number {
+		return this.cache.size;
 	}
 
 	/**
@@ -123,13 +115,13 @@ export default class EvictingCache {
 	 * @override
 	 * @returns {string} The description of the object.
 	 */
-	get [Symbol.toStringTag]() {
+	get [Symbol.toStringTag](): string {
 		return 'EvictingCache';
 	}
 
-	#put(key, value) {
-		this.#cache.addFirst(key, value);
-		if (this.#cache.size > this.#capacity) { this.evict() }
+	private putAndEvict(key: K, value: V): V {
+		this.cache.addFirst(key, value);
+		if (this.cache.size > this.$capacity) { this.evict() }
 
 		return value;
 	}

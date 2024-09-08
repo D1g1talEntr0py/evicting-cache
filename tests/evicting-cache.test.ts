@@ -1,30 +1,30 @@
-import EvictingCache from '../src/evicting-cache';
-import { describe, test, expect } from '@jest/globals';
+import { EvictingCache } from '../src/evicting-cache';
+import { describe, test, expect } from 'vitest';
 
 describe('EvictingCache', () => {
 	test('constructor', () => {
-		const cache = new EvictingCache();
+		const cache = new EvictingCache<string, number>();
 		expect(cache.capacity).toBe(100);
 		expect(cache.size).toBe(0);
 		expect(cache.toString()).toBe('[object EvictingCache]');
 	});
 
 	test('constructor with capacity', () => {
-		const cache = new EvictingCache(3);
+		const cache = new EvictingCache<string, number>(3);
 		expect(cache.capacity).toBe(3);
 		expect(cache.size).toBe(0);
 		expect(cache.toString()).toBe('[object EvictingCache]');
 	});
 
 	test('constructor with invalid capacity', () => {
-		expect(() => new EvictingCache(-1)).toThrow(RangeError);
-		expect(() => new EvictingCache(0)).toThrow(RangeError);
-		expect(() => new EvictingCache(1.5)).toThrow(RangeError);
-		expect(() => new EvictingCache(Infinity)).toThrow(RangeError);
+		expect(() => new EvictingCache<string, number>(-1)).toThrow(RangeError);
+		expect(() => new EvictingCache<string, number>(0)).toThrow(RangeError);
+		expect(() => new EvictingCache<string, number>(1.5)).toThrow(RangeError);
+		expect(() => new EvictingCache<string, number>(Infinity)).toThrow(RangeError);
 	});
 
 	test('put', () => {
-		const cache = new EvictingCache(3);
+		const cache = new EvictingCache<string, number>(3);
 		expect(cache.put('a', 1)).toBeUndefined();
 		expect(cache.put('b', 2)).toBeUndefined();
 		expect(cache.put('c', 3)).toBeUndefined();
@@ -33,7 +33,7 @@ describe('EvictingCache', () => {
 	});
 
 	test('get', () => {
-		const cache = new EvictingCache(3);
+		const cache = new EvictingCache<string, number>(3);
 		expect(cache.put('a', 1)).toBeUndefined();
 		expect(cache.put('b', 2)).toBeUndefined();
 		expect(cache.put('c', 3)).toBeUndefined();
@@ -44,7 +44,7 @@ describe('EvictingCache', () => {
 	});
 
 	test('getOrPut', () => {
-		const cache = new EvictingCache(3);
+		const cache = new EvictingCache<string, number>(3);
 		expect(cache.getOrPut('a', () => 1)).toBe(1);
 		expect(cache.getOrPut('b', () => 2)).toBe(2);
 		expect(cache.getOrPut('c', () => 3)).toBe(3);
@@ -55,7 +55,7 @@ describe('EvictingCache', () => {
 	});
 
 	test('evict', () => {
-		const cache = new EvictingCache(3);
+		const cache = new EvictingCache<string, number>(3);
 		expect(cache.put('a', 1)).toBeUndefined();
 		expect(cache.put('b', 2)).toBeUndefined();
 		expect(cache.put('c', 3)).toBeUndefined();
@@ -70,7 +70,7 @@ describe('EvictingCache', () => {
 	});
 
 	test('clear', () => {
-		const cache = new EvictingCache(3);
+		const cache = new EvictingCache<string, number>(3);
 		expect(cache.put('a', 1)).toBeUndefined();
 		expect(cache.put('b', 2)).toBeUndefined();
 		expect(cache.put('c', 3)).toBeUndefined();
@@ -79,12 +79,12 @@ describe('EvictingCache', () => {
 	});
 
 	test('capacity', () => {
-		const cache = new EvictingCache(3);
+		const cache = new EvictingCache<string, number>(3);
 		expect(cache.capacity).toBe(3);
 	});
 
 	test('size', () => {
-		const cache = new EvictingCache(3);
+		const cache = new EvictingCache<string, number>(3);
 		expect(cache.size).toBe(0);
 		expect(cache.put('a', 1)).toBeUndefined();
 		expect(cache.size).toBe(1);
@@ -105,29 +105,29 @@ describe('EvictingCache', () => {
 	});
 
 	test('Symbol.toStringTag', () => {
-		const cache = new EvictingCache(3);
+		const cache = new EvictingCache<string, number>(3);
 		expect(cache[Symbol.toStringTag]).toBe('EvictingCache');
 	});
 
 	test('put with existing key', () => {
-		const cache = new EvictingCache(3);
+		const cache = new EvictingCache<string, number>(3);
 		expect(cache.put('a', 1)).toBeUndefined();
 		expect(cache.put('a', 2)).toBeUndefined();
 		expect(cache.get('a')).toBe(2);
 	});
 
 	test('get with non-existent key', () => {
-		const cache = new EvictingCache(3);
+		const cache = new EvictingCache<string, number>(3);
 		expect(cache.get('a')).toBe(null);
 	});
 
 	test('evict with empty cache', () => {
-		const cache = new EvictingCache(3);
+		const cache = new EvictingCache<string, number>(3);
 		expect(cache.evict()).toBe(false);
 	});
 
 	test('clear with empty cache', () => {
-		const cache = new EvictingCache(3);
+		const cache = new EvictingCache<string, number>(3);
 		expect(cache.clear()).toBeUndefined();
 	});
 });
