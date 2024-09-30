@@ -1,7 +1,7 @@
 {
   "name": "evicting-cache",
   "author": "D1g1talEntr0py",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "license": "ISC",
   "description": "Cache implementation with an LRU evicting policy",
   "type": "module",
@@ -18,12 +18,13 @@
   "scripts": {
     "build": "tsbuild",
     "build:watch": "tsbuild --watch",
+		"type-check": "tsbuild --typeCheck",
     "lint": "eslint",
     "test": "vitest run --coverage",
     "test:watch": "vitest",
     "prepublish": "pnpm lint && pnpm test && pnpm -s build"
   },
-  "packageManager": "pnpm@9.5.0+sha512.140036830124618d624a2187b50d04289d5a087f326c9edfc0ccd733d76c4f52c3a313d4fc148794a2a9d81553016004e6742e8cf850670268a7387fc220c903",
+  "packageManager": "pnpm@9.11.0+sha512.0a203ffaed5a3f63242cd064c8fb5892366c103e328079318f78062f24ea8c9d50bc6a47aa3567cabefd824d170e78fa2745ed1f16b132e16436146b7688f19b",
   "keywords": [
     "cache",
     "evicting-cache",
@@ -32,23 +33,23 @@
     "evicting-lru-cache"
   ],
   "dependencies": {
-    "@d1g1tal/collections": "^2.0.1"
+    "@d1g1tal/collections": "^2.0.2"
   },
   "devDependencies": {
     "@eslint/compat": "^1.1.1",
     "@types/eslint": "^9.6.1",
     "@types/eslint__js": "^8.42.3",
-    "@types/node": "^22.5.4",
-    "@typescript-eslint/eslint-plugin": "^8.4.0",
-    "@typescript-eslint/parser": "^8.4.0",
-    "@vitest/coverage-v8": "^2.0.5",
-    "eslint": "^9.10.0",
-    "eslint-plugin-compat": "^6.0.0",
-    "eslint-plugin-jsdoc": "^50.2.2",
+    "@types/node": "^22.7.4",
+    "@typescript-eslint/eslint-plugin": "^8.7.0",
+    "@typescript-eslint/parser": "^8.7.0",
+    "@vitest/coverage-v8": "^2.1.1",
+    "eslint": "^9.11.1",
+    "eslint-plugin-compat": "^6.0.1",
+    "eslint-plugin-jsdoc": "^50.3.0",
     "globals": "^15.9.0",
-    "typescript": "^5.5.4",
-    "typescript-eslint": "^8.4.0",
-    "vitest": "^2.0.5"
+    "typescript": "^5.6.2",
+    "typescript-eslint": "^8.7.0",
+    "vitest": "^2.1.1"
   },
   "browserslist": [
     "defaults",
