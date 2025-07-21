@@ -130,4 +130,12 @@ describe('EvictingCache', () => {
 		const cache = new EvictingCache<string, number>(3);
 		expect(cache.clear()).toBeUndefined();
 	});
+
+	test('peek', () => {
+		const cache = new EvictingCache<string, number>(3);
+		expect(cache.put('a', 1)).toBeUndefined();
+		expect(cache.peek('a')).toBe(1);
+		expect(cache.peek('b')).toBe(null);
+		expect(cache.size).toBe(1);
+	});
 });

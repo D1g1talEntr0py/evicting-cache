@@ -1,4 +1,4 @@
-import { LinkedMap } from '@d1g1tal/collections/src';
+import { LinkedMap } from '@d1g1tal/collections';
 
 /** JavaScript implementation of a Least Recently Used(LRU) Cache using a doubly linked list. */
 export class EvictingCache<K, V> {
@@ -53,6 +53,16 @@ export class EvictingCache<K, V> {
 	 */
 	put(key: K, value: V): void {
 		this.putAndEvict(key, value);
+	}
+
+	/**
+	 * Returns the value associated with the given key from the cache without updating the LRU order.
+	 *
+	 * @param {K} key The key to get the value for.
+	 * @returns {V | null} The associated value if the key is in the cache, or null otherwise.
+	 */
+	peek(key: K): V | null {
+		return this.cache.get(key) ?? null;
 	}
 
 	/**
