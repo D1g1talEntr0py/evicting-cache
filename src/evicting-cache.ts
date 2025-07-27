@@ -1,9 +1,7 @@
-import { LinkedMap } from '@d1g1tal/collections';
-
-/** JavaScript implementation of a Least Recently Used(LRU) Cache using a doubly linked list. */
+/** JavaScript implementation of a Least Recently Used(LRU) Cache using a Map. */
 export class EvictingCache<K, V> {
-	private readonly $capacity: number;
-	private readonly cache: LinkedMap<K, V>;
+	private readonly _capacity: number;
+	private readonly cache: Map<K, V>;
 
 	/**
 	 * Creates a new Evicting Cache with the given capacity.
@@ -14,8 +12,8 @@ export class EvictingCache<K, V> {
 		if (capacity < 1) { throw new RangeError('capacity must be greater than 0') }
 		if (!Number.isInteger(capacity)) { throw new RangeError('capacity must be an integer') }
 
-		this.$capacity = capacity;
-		this.cache = new LinkedMap();
+		this._capacity = capacity;
+		this.cache = new Map();
 	}
 
 	/**
@@ -26,9 +24,11 @@ export class EvictingCache<K, V> {
 	 */
 	get(key: K): V | null {
 		const value = this.cache.get(key);
-		if (!value) { return null }
+		if (value === undefined) { return null }
 
-		this.cache.moveToFirst(key);
+		this.cache.delete(key);
+		// Move the accessed item to the end (most recently used)
+		this.cache.set(key, value);
 
 		return value;
 	}
@@ -81,7 +81,10 @@ export class EvictingCache<K, V> {
 	 * @returns {boolean} True if an item was removed, false otherwise.
 	 */
 	evict(): boolean {
-		return this.cache.size ? this.cache.removeLast() : false;
+		if (this.cache.size === 0) { return false }
+		const key = this.cache.keys().next().value as K;
+
+		return this.cache.delete(key);
 	}
 
 	/**
@@ -102,7 +105,7 @@ export class EvictingCache<K, V> {
 	 * @returns {number} The capacity of the cache.
 	 */
 	get capacity(): number {
-		return this.$capacity;
+		return this._capacity;
 	}
 
 	/**
@@ -130,8 +133,11 @@ export class EvictingCache<K, V> {
 	}
 
 	private putAndEvict(key: K, value: V): V {
-		this.cache.addFirst(key, value);
-		if (this.cache.size > this.$capacity) { this.evict() }
+		// If the key already exists, remove it to update the LRU order and then set the new value.
+		// This ensures that the most recently used item is at the end of the Map.
+		if (this.cache.has(key)) { this.cache.delete(key) }
+		this.cache.set(key, value);
+		if (this.cache.size > this._capacity) { this.evict() }
 
 		return value;
 	}
