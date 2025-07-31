@@ -123,6 +123,46 @@ export class EvictingCache<K, V> {
 	}
 
 	/**
+	 * Returns an iterator over the keys in the cache.
+	 * The keys are returned in the order of least recently used to most recently used.
+	 *
+	 * @returns {IterableIterator<K>} An iterator over the keys in the cache.
+	 */
+	keys(): IterableIterator<K> {
+		return this.cache.keys();
+	}
+
+	/**
+	 * Returns an iterator over the values in the cache.
+	 * The values are returned in the order of least recently used to most recently used.
+	 *
+	 * @returns {IterableIterator<V>} An iterator over the values in the cache.
+	 */
+	values(): IterableIterator<V> {
+		return this.cache.values();
+	}
+
+	/**
+	 * Returns an iterator over the entries in the cache.
+	 * The entries are returned in the order of least recently used to most recently used.
+	 *
+	 * @returns {IterableIterator<[K, V]>} An iterator over the entries in the cache.
+	 */
+	entries(): IterableIterator<[K, V]> {
+		return this.cache.entries();
+	}
+
+	/**
+	 * Returns an iterator over the entries in the cache.
+	 * The entries are returned in the order of least recently used to most recently used.
+	 *
+	 * @returns {IterableIterator<[K, V]>} An iterator over the entries in the cache.
+	 */
+	[Symbol.iterator](): IterableIterator<[K, V]> {
+		return this.entries();
+	}
+
+	/**
 	 * Gets the description of the object.
 	 *
 	 * @override
@@ -132,12 +172,22 @@ export class EvictingCache<K, V> {
 		return 'EvictingCache';
 	}
 
+	/**
+	 * Puts a key-value pair into the cache and evicts the least recently used item if necessary.
+	 * If the key already exists, the item is removed and re-added to update its position.
+	 * If the cache is full, the least recently used item is evicted and the new item is added.
+	 * @param {K} key The key to put.
+	 * @param {V} value The value to put.
+	 * @returns {V} The value that was put.
+	 */
 	private putAndEvict(key: K, value: V): V {
-		// If the key already exists, remove it to update the LRU order and then set the new value.
-		// This ensures that the most recently used item is at the end of the Map.
-		if (this.cache.has(key)) { this.cache.delete(key) }
+		if (this.cache.has(key)) {
+			this.cache.delete(key);
+		} else if (this._capacity <= this.cache.size) {
+			this.evict();
+		}
+
 		this.cache.set(key, value);
-		if (this.cache.size > this._capacity) { this.evict() }
 
 		return value;
 	}
