@@ -25,9 +25,5 @@
 		"lib": [ "ESNext", "DOM" ]
 	},
 	"include": [ "./src" ],
-	"tsbuild": {
-		"minify": true,
-		"entryPoints": { "evicting-cache": "src/evicting-cache.ts" },
-		"noExternal": [	"@d1g1tal/collections" ]
-	}
+	"tsbuild": { "entryPoints": { "evicting-cache": "src/evicting-cache.ts" } }
 }

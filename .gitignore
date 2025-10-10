@@ -12,6 +12,7 @@
 # Built Visual Studio Code Extensions
 *.vsix
 
+.tsbuild/
 dist
 node_modules
 
