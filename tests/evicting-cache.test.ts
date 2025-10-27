@@ -405,4 +405,353 @@ describe('EvictingCache', () => {
 			expect(entries).toEqual([[2, { text: 'b' }], [3, { text: 'c' }], [1, { text: 'a' }]]);
 		});
 	});
+
+	describe('delete', () => {
+		test('removes existing key', () => {
+			const cache = new EvictingCache<string, number>(3);
+			cache.put('a', 1);
+			expect(cache.delete('a')).toBe(true);
+			expect(cache.has('a')).toBe(false);
+			expect(cache.size).toBe(0);
+		});
+
+		test('returns false for non-existent key', () => {
+			const cache = new EvictingCache<string, number>(3);
+			expect(cache.delete('a')).toBe(false);
+		});
+
+		test('works with object keys', () => {
+			const cache = new EvictingCache<{ id: number }, string>(3);
+			const key1 = { id: 1 };
+			const key2 = { id: 2 };
+			cache.put(key1, 'one');
+			cache.put(key2, 'two');
+			expect(cache.delete(key1)).toBe(true);
+			expect(cache.has(key1)).toBe(false);
+			expect(cache.has(key2)).toBe(true);
+			expect(cache.size).toBe(1);
+		});
+	});
+
+	describe('forEach', () => {
+		test('iterates over all entries', () => {
+			const cache = new EvictingCache<string, number>(3);
+			cache.put('a', 1);
+			cache.put('b', 2);
+			cache.put('c', 3);
+
+			const entries: [string, number][] = [];
+			cache.forEach((value, key) => {
+				entries.push([key, value]);
+			});
+
+			expect(entries).toEqual([['a', 1], ['b', 2], ['c', 3]]);
+		});
+
+		test('passes cache instance as third argument', () => {
+			const cache = new EvictingCache<string, string>(2);
+			cache.put('x', 'hello');
+
+			let passedCache: EvictingCache<string, string> | undefined;
+			cache.forEach((value, key, c) => {
+				passedCache = c;
+			});
+
+			expect(passedCache).toBe(cache);
+		});
+
+		test('respects thisArg', () => {
+			const cache = new EvictingCache<number, string>(2);
+			cache.put(1, 'one');
+			cache.put(2, 'two');
+
+			const context = { count: 0 };
+			cache.forEach(function(this: { count: number }) {
+				this.count++;
+			}, context);
+
+			expect(context.count).toBe(2);
+		});
+
+		test('works with empty cache', () => {
+			const cache = new EvictingCache<string, number>(3);
+			const entries: [string, number][] = [];
+			cache.forEach((value, key) => {
+				entries.push([key, value]);
+			});
+			expect(entries).toEqual([]);
+		});
+	});
+
+	describe('batch operations', () => {
+		describe('putAll', () => {
+			test('adds multiple entries', () => {
+				const cache = new EvictingCache<string, number>(3);
+				cache.putAll([['a', 1], ['b', 2], ['c', 3]]);
+				expect(cache.size).toBe(3);
+				expect(cache.get('a')).toBe(1);
+				expect(cache.get('b')).toBe(2);
+				expect(cache.get('c')).toBe(3);
+			});
+
+			test('triggers eviction when capacity exceeded', () => {
+				const cache = new EvictingCache<string, number>(2);
+				cache.putAll([['a', 1], ['b', 2], ['c', 3]]);
+				expect(cache.size).toBe(2);
+				expect(cache.has('a')).toBe(false);
+				expect(cache.get('b')).toBe(2);
+				expect(cache.get('c')).toBe(3);
+			});
+
+			test('works with empty iterable', () => {
+				const cache = new EvictingCache<string, number>(3);
+				cache.putAll([]);
+				expect(cache.size).toBe(0);
+			});
+
+			test('updates existing keys', () => {
+				const cache = new EvictingCache<string, number>(3);
+				cache.put('a', 1);
+				cache.putAll([['a', 10], ['b', 2]]);
+				expect(cache.get('a')).toBe(10);
+				expect(cache.size).toBe(2);
+			});
+
+			test('works with Map as input', () => {
+				const cache = new EvictingCache<string, number>(3);
+				const map = new Map([['x', 100], ['y', 200]]);
+				cache.putAll(map);
+				expect(cache.get('x')).toBe(100);
+				expect(cache.get('y')).toBe(200);
+			});
+		});
+
+		describe('getAll', () => {
+			test('retrieves multiple values', () => {
+				const cache = new EvictingCache<string, number>(3);
+				cache.put('a', 1);
+				cache.put('b', 2);
+				const result = cache.getAll(['a', 'b', 'c']);
+				expect(result.size).toBe(2);
+				expect(result.get('a')).toBe(1);
+				expect(result.get('b')).toBe(2);
+				expect(result.has('c')).toBe(false);
+			});
+
+			test('updates LRU order for retrieved keys', () => {
+				const cache = new EvictingCache<string, number>(3);
+				cache.put('a', 1);
+				cache.put('b', 2);
+				cache.put('c', 3);
+				cache.getAll(['a']); // Move 'a' to end
+				cache.put('d', 4); // Should evict 'b'
+				expect(cache.has('a')).toBe(true);
+				expect(cache.has('b')).toBe(false);
+				expect(cache.has('c')).toBe(true);
+				expect(cache.has('d')).toBe(true);
+			});
+
+			test('works with empty iterable', () => {
+				const cache = new EvictingCache<string, number>(3);
+				cache.put('a', 1);
+				const result = cache.getAll([]);
+				expect(result.size).toBe(0);
+			});
+
+			test('works with Set as input', () => {
+				const cache = new EvictingCache<string, number>(3);
+				cache.put('a', 1);
+				cache.put('b', 2);
+				const keys = new Set(['a', 'b', 'c']);
+				const result = cache.getAll(keys);
+				expect(result.size).toBe(2);
+			});
+		});
+
+		describe('deleteAll', () => {
+			test('removes multiple keys', () => {
+				const cache = new EvictingCache<string, number>(3);
+				cache.put('a', 1);
+				cache.put('b', 2);
+				cache.put('c', 3);
+				const count = cache.deleteAll(['a', 'c', 'd']);
+				expect(count).toBe(2);
+				expect(cache.size).toBe(1);
+				expect(cache.has('b')).toBe(true);
+			});
+
+			test('returns 0 for empty iterable', () => {
+				const cache = new EvictingCache<string, number>(3);
+				cache.put('a', 1);
+				const count = cache.deleteAll([]);
+				expect(count).toBe(0);
+				expect(cache.size).toBe(1);
+			});
+
+			test('returns 0 when no keys exist', () => {
+				const cache = new EvictingCache<string, number>(3);
+				const count = cache.deleteAll(['x', 'y', 'z']);
+				expect(count).toBe(0);
+			});
+
+			test('works with object keys', () => {
+				const cache = new EvictingCache<{ id: number }, string>(3);
+				const key1 = { id: 1 };
+				const key2 = { id: 2 };
+				const key3 = { id: 3 };
+				cache.put(key1, 'one');
+				cache.put(key2, 'two');
+				cache.put(key3, 'three');
+				const count = cache.deleteAll([key1, key3]);
+				expect(count).toBe(2);
+				expect(cache.size).toBe(1);
+				expect(cache.has(key2)).toBe(true);
+			});
+		});
+	});
+
+	describe('statistics', () => {
+		test('tracks hits and misses', () => {
+			const cache = new EvictingCache<string, number>(2);
+			cache.put('a', 1);
+			cache.get('a'); // hit
+			cache.get('b'); // miss
+			cache.get('a'); // hit
+
+			const stats = cache.getStats();
+			expect(stats.hits).toBe(2);
+			expect(stats.misses).toBe(1);
+			expect(stats.hitRate).toBeCloseTo(0.667, 3);
+		});
+
+		test('hitRate is 0 when no gets', () => {
+			const cache = new EvictingCache<string, number>(2);
+			const stats = cache.getStats();
+			expect(stats.hits).toBe(0);
+			expect(stats.misses).toBe(0);
+			expect(stats.hitRate).toBe(0);
+		});
+
+		test('hitRate is 1.0 for all hits', () => {
+			const cache = new EvictingCache<string, number>(2);
+			cache.put('a', 1);
+			cache.get('a');
+			cache.get('a');
+			const stats = cache.getStats();
+			expect(stats.hits).toBe(2);
+			expect(stats.misses).toBe(0);
+			expect(stats.hitRate).toBe(1.0);
+		});
+
+		test('hitRate is 0.0 for all misses', () => {
+			const cache = new EvictingCache<string, number>(2);
+			cache.get('a');
+			cache.get('b');
+			const stats = cache.getStats();
+			expect(stats.hits).toBe(0);
+			expect(stats.misses).toBe(2);
+			expect(stats.hitRate).toBe(0);
+		});
+
+		test('resetStats clears counters', () => {
+			const cache = new EvictingCache<string, number>(2);
+			cache.put('a', 1);
+			cache.get('a'); // hit
+			cache.get('b'); // miss
+			cache.resetStats();
+
+			const stats = cache.getStats();
+			expect(stats.hits).toBe(0);
+			expect(stats.misses).toBe(0);
+			expect(stats.hitRate).toBe(0);
+		});
+
+		test('stats continue after reset', () => {
+			const cache = new EvictingCache<string, number>(2);
+			cache.put('a', 1);
+			cache.get('a');
+			cache.resetStats();
+			cache.get('a'); // new hit
+			cache.get('b'); // new miss
+
+			const stats = cache.getStats();
+			expect(stats.hits).toBe(1);
+			expect(stats.misses).toBe(1);
+			expect(stats.hitRate).toBe(0.5);
+		});
+
+		test('peek does not affect stats', () => {
+			const cache = new EvictingCache<string, number>(2);
+			cache.put('a', 1);
+			cache.peek('a');
+			cache.peek('b');
+
+			const stats = cache.getStats();
+			expect(stats.hits).toBe(0);
+			expect(stats.misses).toBe(0);
+		});
+
+		test('getAll affects stats', () => {
+			const cache = new EvictingCache<string, number>(3);
+			cache.put('a', 1);
+			cache.put('b', 2);
+			cache.getAll(['a', 'b', 'c']); // 2 hits, 1 miss
+
+			const stats = cache.getStats();
+			expect(stats.hits).toBe(2);
+			expect(stats.misses).toBe(1);
+		});
+
+		test('getOrPut affects stats on hit', () => {
+			const cache = new EvictingCache<string, number>(2);
+			cache.put('a', 1);
+			cache.getOrPut('a', () => 999); // hit
+
+			const stats = cache.getStats();
+			expect(stats.hits).toBe(1);
+			expect(stats.misses).toBe(0);
+		});
+
+		test('getOrPut affects stats on miss', () => {
+			const cache = new EvictingCache<string, number>(2);
+			cache.getOrPut('a', () => 1); // miss
+
+			const stats = cache.getStats();
+			expect(stats.hits).toBe(0);
+			expect(stats.misses).toBe(1);
+		});
+	});
+
+	describe('getOrPut error handling', () => {
+		test('does not modify cache when producer throws', () => {
+			const cache = new EvictingCache<string, number>(2);
+			cache.put('a', 1);
+
+			expect(() => {
+				cache.getOrPut('b', () => {
+					throw new Error('Producer failed');
+				});
+			}).toThrow('Producer failed');
+
+			expect(cache.size).toBe(1);
+			expect(cache.has('a')).toBe(true);
+			expect(cache.has('b')).toBe(false);
+		});
+
+		test('stats updated correctly when producer throws', () => {
+			const cache = new EvictingCache<string, number>(2);
+
+			try {
+				cache.getOrPut('a', () => {
+					throw new Error('Producer failed');
+				});
+			} catch {
+				// Expected
+			}
+
+			const stats = cache.getStats();
+			expect(stats.hits).toBe(0);
+			expect(stats.misses).toBe(1); // The get() call still happens
+		});
+	});
 });

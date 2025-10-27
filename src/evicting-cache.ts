@@ -1,7 +1,15 @@
+type CacheStats = {
+	hits: number;
+	misses: number;
+	hitRate: number;
+};
+
 /** JavaScript implementation of a Least Recently Used(LRU) Cache using a Map. */
 export class EvictingCache<K, V> {
 	private readonly _capacity: number;
 	private readonly cache: Map<K, V>;
+	private hits = 0;
+	private misses = 0;
 
 	/**
 	 * Creates a new Evicting Cache with the given capacity.
@@ -24,8 +32,12 @@ export class EvictingCache<K, V> {
 	 */
 	get(key: K): V | null {
 		const value = this.cache.get(key);
-		if (value === undefined) { return null }
+		if (value === undefined) {
+			this.misses++;
+			return null;
+		}
 
+		this.hits++;
 		this.cache.delete(key);
 		// Move the accessed item to the end (most recently used)
 		this.cache.set(key, value);
@@ -56,6 +68,16 @@ export class EvictingCache<K, V> {
 	}
 
 	/**
+	 * Removes the specified key from the cache.
+	 *
+	 * @param {K} key The key to remove.
+	 * @returns {boolean} True if the key was in the cache and was removed, false otherwise.
+	 */
+	delete(key: K): boolean {
+		return this.cache.delete(key);
+	}
+
+	/**
 	 * Returns the value associated with the given key from the cache without updating the LRU order.
 	 *
 	 * @param {K} key The key to get the value for.
@@ -67,33 +89,112 @@ export class EvictingCache<K, V> {
 
 	/**
 	 * Returns the value for the key if it exists in the cache. If not, put the key-value pair into the cache and return the value.
+	 * If the producer function throws an error, the cache state is not modified.
+	 *
 	 * @param {K} key The key.
 	 * @param {function(): V} producer The value to put if the key does not exist in the cache.
 	 * @returns {V} The value corresponding to the key.
 	 */
 	getOrPut(key: K, producer: () => V): V {
-		return this.get(key) ?? this.putAndEvict(key, producer());
+		const existing = this.get(key);
+		if (existing !== null) { return existing }
+
+		// If producer throws, cache state remains unchanged
+		const value = producer();
+		return this.putAndEvict(key, value);
 	}
 
 	/**
 	 * Removes the least recently used key-value pair from the cache.
-	 *
 	 * @returns {boolean} True if an item was removed, false otherwise.
 	 */
 	evict(): boolean {
-		if (this.cache.size === 0) { return false }
-		const key = this.cache.keys().next().value as K;
+		const firstEntry = this.cache.keys().next();
+		if (firstEntry.done) { return false }
 
-		return this.cache.delete(key);
+		return this.cache.delete(firstEntry.value);
 	}
 
 	/**
 	 * Clears the cache and the LRU list.
-	 *
 	 * @returns {void}
 	 */
 	clear(): void {
 		this.cache.clear();
+	}
+
+	/**
+	 * Executes a provided function once per each key/value pair in the cache, in insertion order.
+	 * @param {(value: V, key: K, cache: EvictingCache<K, V>) => void} callbackfn Function to execute for each element.
+	 * @param {unknown} [thisArg] Value to use as `this` when executing callback.
+	 * @returns {void}
+	 */
+	forEach(callbackfn: (value: V, key: K, cache: EvictingCache<K, V>) => void, thisArg?: unknown): void {
+		const boundCallback = thisArg !== undefined ? callbackfn.bind(thisArg) : callbackfn;
+		this.cache.forEach((value, key) => boundCallback(value, key, this));
+	}
+
+	/**
+	 * Adds multiple key-value pairs to the cache.
+	 * Each pair is added individually, following the same LRU eviction rules as put().
+	 * @param {Iterable<[K, V]>} entries The entries to add.
+	 * @returns {void}
+	 */
+	putAll(entries: Iterable<[K, V]>): void {
+		for (const [key, value] of entries) { this.put(key, value) }
+	}
+
+	/**
+	 * Gets multiple values from the cache.
+	 * Each get updates the LRU order for that key.
+	 *
+	 * @param {Iterable<K>} keys The keys to get values for.
+	 * @returns {Map<K, V>} A map of keys to their values (excludes missing keys).
+	 */
+	getAll(keys: Iterable<K>): Map<K, V> {
+		const result = new Map<K, V>();
+		for (const key of keys) {
+			const value = this.get(key);
+			if (value !== null) { result.set(key, value) }
+		}
+
+		return result;
+	}
+
+	/**
+	 * Removes multiple keys from the cache.
+	 *
+	 * @param {Iterable<K>} keys The keys to remove.
+	 * @returns {number} The number of keys that were removed.
+	 */
+	deleteAll(keys: Iterable<K>): number {
+		let count = 0;
+		for (const key of keys) {
+			if (this.cache.delete(key)) { count++ }
+		}
+
+		return count;
+	}
+
+	/**
+	 * Gets cache statistics including hit/miss counts and hit rate.
+	 *
+	 * @returns {CacheStats} Cache statistics.
+	 */
+	getStats(): CacheStats {
+		const total = this.hits + this.misses;
+
+		return { hits: this.hits, misses: this.misses, hitRate: total === 0 ? 0 : this.hits / total };
+	}
+
+	/**
+	 * Resets cache statistics to zero.
+	 *
+	 * @returns {void}
+	 */
+	resetStats(): void {
+		this.hits = 0;
+		this.misses = 0;
 	}
 
 	/**
@@ -181,11 +282,8 @@ export class EvictingCache<K, V> {
 	 * @returns {V} The value that was put.
 	 */
 	private putAndEvict(key: K, value: V): V {
-		if (this.cache.has(key)) {
-			this.cache.delete(key);
-		} else if (this._capacity <= this.cache.size) {
-			this.evict();
-		}
+		const existed = this.cache.delete(key);
+		if (!existed && this._capacity <= this.cache.size) { this.evict() }
 
 		this.cache.set(key, value);
 

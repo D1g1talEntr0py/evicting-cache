@@ -18,12 +18,14 @@
   "scripts": {
     "build": "tsbuild",
     "build:watch": "tsbuild --watch",
-    "type-check": "tsbuild --typeCheck",
+    "type-check": "tsbuild --type-check",
     "lint": "eslint",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
     "test:watch": "vitest",
-    "prepublish": "pnpm lint && pnpm test && pnpm -s build"
+    "prepublish": "pnpm lint && pnpm test && pnpm -s build --minify --force",
+    "preversion": "pnpm lint && pnpm test",
+    "version": "node -e \"const fs=require('fs');const d=new Date().toISOString().split('T')[0];const v=require('./package.json').version;let c=fs.readFileSync('CHANGELOG.md','utf8');c=c.replace('## [Unreleased]','## ['+v+'] - '+d);fs.writeFileSync('CHANGELOG.md',c);\" && git add CHANGELOG.md"
   },
   "keywords": [
     "cache",
@@ -34,19 +36,19 @@
   ],
   "devDependencies": {
     "@eslint/compat": "^1.4.0",
-    "@eslint/js": "^9.37.0",
+    "@eslint/js": "^9.38.0",
     "@types/eslint": "^9.6.1",
-    "@types/node": "^24.7.1",
-    "@typescript-eslint/eslint-plugin": "^8.46.0",
-    "@typescript-eslint/parser": "^8.46.0",
-    "@vitest/coverage-v8": "^3.2.4",
-    "eslint": "^9.37.0",
+    "@types/node": "^24.9.1",
+    "@typescript-eslint/eslint-plugin": "^8.46.2",
+    "@typescript-eslint/parser": "^8.46.2",
+    "@vitest/coverage-v8": "^4.0.4",
+    "eslint": "^9.38.0",
     "eslint-plugin-compat": "^6.0.2",
-    "eslint-plugin-jsdoc": "^61.1.0",
+    "eslint-plugin-jsdoc": "^61.1.9",
     "globals": "^16.4.0",
     "typescript": "^5.9.3",
-    "typescript-eslint": "^8.46.0",
-    "vitest": "^3.2.4"
+    "typescript-eslint": "^8.46.2",
+    "vitest": "^4.0.4"
   },
   "browserslist": [
     "defaults",
