@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Changed
+- Updated README with comprehensive documentation of all features
+- Added badges for npm version, downloads, license, TypeScript version, and test coverage
+- Improved code examples in README for clarity
+- Added detailed usage examples for all API methods
+- Added performance characteristics table
+- Added complete API reference section
+- Enhanced TypeScript usage examples
+
+### Fixed
+- Fixed import statement in README to use named export `{ EvictingCache }` instead of default import
+
 ## [2.3.0] - 2025-10-27
 
 ### Added
@@ -31,4 +45,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Security
 - Replaced `any` type with `unknown` type in `forEach()` `thisArg` parameter for improved type safety
 
-## [2.3.0] - Previous Release
+## [2.2.1] - Previous Release
