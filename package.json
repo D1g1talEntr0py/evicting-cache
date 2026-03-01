@@ -23,7 +23,7 @@
   "scripts": {
     "build": "tsbuild",
     "build:watch": "tsbuild --watch",
-    "type-check": "tsbuild --type-check",
+    "type-check": "tsbuild --noEmit",
     "lint": "eslint",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
