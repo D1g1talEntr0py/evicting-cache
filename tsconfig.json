@@ -24,6 +24,5 @@
 		"moduleResolution": "Bundler",
 		"lib": [ "ESNext", "DOM" ]
 	},
-	"include": [ "./src" ],
-	"tsbuild": { "entryPoints": { "evicting-cache": "src/evicting-cache.ts" } }
+	"include": [ "./src" ]
 }
