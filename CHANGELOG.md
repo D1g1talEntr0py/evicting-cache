@@ -1,3 +1,13 @@
+## [3.0.1](https://github.com/D1g1talEntr0py/evicting-cache/compare/v3.0.0...v3.0.1) (2026-03-01)
+
+### Bug Fixes
+
+* fixed invalid flag for type-check script (808b4d21b02c22a46aeaa4b39ff1103dc70f7bc9)
+
+### Continuous Integration
+
+* added repository to package.json (1dc7b1b2e15432e1020752d740c99d31009336f1)
+
 ## [3.0.0](https://github.com/D1g1talEntr0py/evicting-cache/compare/v2.2.1...v3.0.0) (2026-03-01)
 
 ### ⚠ BREAKING CHANGES
