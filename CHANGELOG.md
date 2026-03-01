@@ -1,3 +1,60 @@
+## [3.0.0](https://github.com/D1g1talEntr0py/evicting-cache/compare/v2.2.1...v3.0.0) (2026-03-01)
+
+### ⚠ BREAKING CHANGES
+
+* None - all changes are backward compatible
+
+### Features
+
+* add batch operations, statistics tracking, and performance optimizations (3dd757608e71e1d4d736cc7d2306ad5bec3392d2)
+Added new API methods:
+- delete(key) - explicit item removal matching Map API
+- forEach(callback, thisArg) - iteration with proper this binding
+- putAll/getAll/deleteAll - batch operations for multiple keys
+- getStats/resetStats - cache hit/miss statistics tracking
+
+Performance improvements:
+- Optimized evict() by removing unsafe type assertion
+- Optimized putAndEvict() by eliminating redundant has() check
+
+Other improvements:
+- Enhanced getOrPut() error handling documentation
+- Improved type safety using 'unknown' instead of 'any'
+- Added comprehensive test suite maintaining 100% coverage
+
+
+### Documentation
+
+* update badges on README.md (dfdde3bf8dd52f70035c376055fbcdfadd972f90)
+* update README with comprehensive documentation (8476509c194e674cca5c033fa701a996e067c3dd)
+- Add badges for npm version, downloads, license, TypeScript, and coverage
+- Add detailed API reference and usage examples for all methods
+- Add performance table showing O(1) operations
+- Standardize code examples to 2-space indentation
+- Fix import statement to use named export { EvictingCache }
+
+
+### Miscellaneous Chores
+
+* **deps:** Updates pnpm lockfile to reflect dependency upgrades (eb9bb5e7d07fecc581977be618cf3d2b0efe2810)
+Refreshes the lockfile to match bumped devDependencies and toolchain updates so installs are reproducible and CI uses the exact updated dependency tree.
+
+* **githooks:** Adds commit-msg hook (deb5d8a158283312172a043ee2ceb2b11fea13b6)
+Adds an executable hook that enforces Conventional Commits for all commit messages to keep commit history structured and machine-readable for release tooling and CI validation.
+
+* **package:** Updates package exports and devDependencies (ad8e4685fc938aae48baaa2fb254dfc2510a688d)
+Updates the package exports to point to built artifacts and bumps a set of development tooling versions to align with newer runtime and linting ecosystems; removes an inline tsbuild entry to rely on external build tooling.
+
+
+### Continuous Integration
+
+* add packageManager to package.json file (49d43111e3a56f5a2fe34ac915089228b2ba7c90)
+* Adds CI workflow (235caead19ce418229750e13b00ca768598916d5)
+Adds a GitHub Actions CI pipeline that runs installs, linting, type checks, tests with coverage, and builds across a Node matrix to ensure quality and compatibility across supported Node versions.
+
+* **release:** Adds release workflow & semantic-release config (0b8da372b6366b947d001a57e4415541e04105b7)
+Automates releases on main by wiring a release workflow and configuring semantic-release so versioning and changelogs are generated from Conventional Commits and publishes artifacts accordingly.
+
 # Changelog
 
 All notable changes to this project will be documented in this file.
