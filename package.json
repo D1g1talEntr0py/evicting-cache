@@ -5,6 +5,10 @@
   "packageManager": "pnpm@10.30.3",
   "license": "ISC",
   "description": "Cache implementation with an LRU evicting policy",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/D1g1talEntr0py/evicting-cache"
+  },
   "type": "module",
   "exports": {
     ".": {
