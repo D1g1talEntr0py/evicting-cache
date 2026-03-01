@@ -1,10 +1,12 @@
 # Evicting Cache
 
-[![npm version](https://img.shields.io/npm/v/evicting-cache.svg)](https://www.npmjs.com/package/evicting-cache)
-[![npm downloads](https://img.shields.io/npm/dm/evicting-cache.svg)](https://www.npmjs.com/package/evicting-cache)
-[![License: ISC](https://img.shields.io/badge/License-ISC-blue.svg)](https://opensource.org/licenses/ISC)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.9-blue.svg)](https://www.typescriptlang.org/)
-[![Test Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen.svg)](https://github.com/D1g1talEntr0py/evicting-cache)
+[![npm version](https://img.shields.io/npm/v/@d1g1tal/evicting-cache?color=blue)](https://www.npmjs.com/package/@d1g1tal/evicting-cache)
+[![npm downloads](https://img.shields.io/npm/dm/@d1g1tal/evicting-cache)](https://www.npmjs.com/package/@d1g1tal/evicting-cache)
+[![CI](https://github.com/D1g1talEntr0py/evicting-cache/actions/workflows/ci.yml/badge.svg)](https://github.com/D1g1talEntr0py/evicting-cache/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/D1g1talEntr0py/evicting-cache/graph/badge.svg)](https://codecov.io/gh/D1g1talEntr0py/evicting-cache)
+[![License: MIT](https://img.shields.io/github/license/D1g1talEntr0py/evicting-cache)](https://github.com/D1g1talEntr0py/evicting-cache/blob/main/LICENSE)
+[![Node.js](https://img.shields.io/node/v/@d1g1tal/evicting-cache)](https://nodejs.org)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.9-blue?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 
 A lightweight, high-performance TypeScript implementation of an LRU (Least Recently Used) cache with automatic eviction.
 
