@@ -1,3 +1,10 @@
+## [3.0.3](https://github.com/D1g1talEntr0py/evicting-cache/compare/v3.0.2...v3.0.3) (2026-03-16)
+
+### Bug Fixes
+
+* **release:** I just want this to work... (6a8b4103f7720c00c502ca9cf50c4f262d35afb0)
+* **release:** kill me now (f8d2196a740389ea0acec8b9deedf408a2784c42)
+
 ## [3.0.2](https://github.com/D1g1talEntr0py/evicting-cache/compare/v3.0.1...v3.0.2) (2026-03-16)
 
 ### Bug Fixes
