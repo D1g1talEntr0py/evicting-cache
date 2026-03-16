@@ -1,2 +1,5 @@
 onlyBuiltDependencies:
   - esbuild
+
+pnpm:
+  autoInstallPeers: false
