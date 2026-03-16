@@ -1,3 +1,20 @@
+## [3.0.2](https://github.com/D1g1talEntr0py/evicting-cache/compare/v3.0.1...v3.0.2) (2026-03-16)
+
+### Bug Fixes
+
+* **ci:** Fix publishing to include a valid release (997fa6a8f56d9b3fe91f8cc2206b1169607ddb25)
+* **ci:** fixed autoInstallPeers mismatch (c8778b682546bd9767a3664a858435776b59f1b3)
+* **ci:** more fun with peer install conflicts (53fa74b13e0688059722ad8634c1bf8bfa596de5)
+* **ci:** more GitHub actions nonsense (e211d1ad81397f4b720dc534e4f8cbe9f02ce44f)
+
+### Documentation
+
+* fixed badges on README.md, again (b4996da990f80df4230abfe4fc929954931ba989)
+
+### Miscellaneous Chores
+
+* **deps:** updated dev dependencies and fixed package.json (6ee9c740653667b6f7f2ba5d26cab7280ae61b40)
+
 ## [3.0.1](https://github.com/D1g1talEntr0py/evicting-cache/compare/v3.0.0...v3.0.1) (2026-03-01)
 
 ### Bug Fixes
