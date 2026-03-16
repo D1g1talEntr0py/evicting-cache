@@ -1,3 +1,14 @@
+## [3.0.4](https://github.com/D1g1talEntr0py/evicting-cache/compare/v3.0.3...v3.0.4) (2026-03-16)
+
+### Bug Fixes
+
+* **release:** updated invalid node version (7d2273211f13e5369698bfe2cb8d4455c5798c98)
+
+### Miscellaneous Chores
+
+* fix license (62279e557ef3289fcdaf693abc9bcb6d9c9499c0)
+* **publish:** remove /src folder from package (0d5fd5302b50ac7013cd7fee88d311a5dac2e389)
+
 ## [3.0.3](https://github.com/D1g1talEntr0py/evicting-cache/compare/v3.0.2...v3.0.3) (2026-03-16)
 
 ### Bug Fixes
