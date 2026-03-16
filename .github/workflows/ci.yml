@@ -25,7 +25,9 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           cache: pnpm
-      - run: pnpm install --frozen-lockfile --config.auto-install-peers=false
+      - run: pnpm install --frozen-lockfile
+        env:
+          NPM_CONFIG_AUTO_INSTALL_PEERS: 'false'
       - run: pnpm lint
       - run: pnpm type-check
       - run: pnpm test:coverage
