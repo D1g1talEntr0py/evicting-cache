@@ -1,3 +1,18 @@
+## [3.0.5](https://github.com/D1g1talEntr0py/evicting-cache/compare/v3.0.4...v3.0.5) (2026-03-27)
+
+### Bug Fixes
+
+* **ci:** pnpm and their lockfile can go kick rocks (e9b59724aab96bba173129279673c73e207381a7)
+* **deps:** update to TypeScript 6 and resolve security vulnerabilities (4b995c0ad8c74a0ff7096f886afc668479270743)
+
+### Styles
+
+* **evicting-cache:** remove redundant type annotations from code and JSDoc (e462d45da67ffd4c3473f7655293af638ad8919e)
+
+### Build System
+
+* **typescript:** simplify tsconfig compiler options (b44b1f65c137c80f19503829420e6598f7f2033e)
+
 ## [3.0.4](https://github.com/D1g1talEntr0py/evicting-cache/compare/v3.0.3...v3.0.4) (2026-03-16)
 
 ### Bug Fixes
