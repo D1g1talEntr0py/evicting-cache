@@ -1,7 +1,7 @@
 {
   "name": "evicting-cache",
   "author": "D1g1talEntr0py",
-  "version": "3.0.5",
+  "version": "3.0.6",
   "license": "ISC",
   "description": "Cache implementation with an LRU evicting policy",
   "homepage": "https://github.com/D1g1talEntr0py/evicting-cache#readme",
@@ -27,7 +27,7 @@
     "access": "public"
   },
   "type": "module",
-	"types": "./dist/evicting-cache.d.ts",
+  "types": "./dist/evicting-cache.d.ts",
   "exports": {
     ".": {
       "types": "./dist/evicting-cache.d.ts",

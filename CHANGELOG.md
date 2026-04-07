@@ -1,3 +1,35 @@
+## [3.0.6](https://github.com/D1g1talEntr0py/evicting-cache/compare/v3.0.5...v3.0.6) (2026-04-07)
+
+### Bug Fixes
+
+* **ci:** remove setting from ci and publish GitHub actions having to do with peer dependencies (60094d539d10288ca1a0d2520b730a6a82c78516)
+* **deps:** updates vitest and dependencies to resolve CVE-2026-39363 (b7cd41c89cf3fd2b4f51b60a6b1cc0f92785dafb)
+Bumps vitest, eslint, typescript, and related packages to newer versions.
+Resolves a transient security vulnerability in the vite package (CVE-2026-39363) by upgrading vitest.
+Updates the packageManager field to pnpm@10.33.0 and defines the types export in package.json.
+
+
+### Code Refactoring
+
+* enables isolatedDeclarations and adds explicit return types (1d5d945ee36d40ae1e7556de6d30cd36c9ac58a6)
+Configures tsconfig.json to enable isolatedDeclarations for better build performance.
+Adds explicit return types to all methods within the EvictingCache class to comply with the new TypeScript requirements.
+Adjusts other compiler options, including enabling sourceMap and stableTypeOrdering.
+
+
+### Build System
+
+* configures allowed builds in pnpm workspace (3c8fcd3dbc375156223643b11b5b32c0c0d21114)
+Adds an allowBuilds specification to pnpm-workspace.yaml.
+Approves safe build scripts for automatic execution during workspace initialization.
+
+
+### Continuous Integration
+
+* updates github actions and semantic release rules (9f8455732a1ade0c5f86d46b6a085fb7230d1da3)
+Upgrades the pnpm/action-setup reference to v5 in CI/CD workflows.
+Adds a semantic-release rule to ensure commits marked as breaking trigger a major release version.
+
 ## [3.0.5](https://github.com/D1g1talEntr0py/evicting-cache/compare/v3.0.4...v3.0.5) (2026-03-27)
 
 ### Bug Fixes
