@@ -1,18 +1,18 @@
 {
-	"clean": true,
 	"compilerOptions": {
+		"sourceMap": true,
 		"declaration": true,
+		"isolatedDeclarations": true,
 		"isolatedModules": true,
-		"useUnknownInCatchVariables": true,
-		"forceConsistentCasingInFileNames": true,
 		"allowUnusedLabels": false,
 		"allowUnreachableCode": false,
 		"noImplicitOverride": true,
 		"noImplicitReturns": true,
+		"stableTypeOrdering": true,
 		"noUncheckedIndexedAccess": true,
 		"rootDir": "./src",
 		"lib": [ "ESNext", "DOM" ],
-		"moduleResolution": "Bundler"
+		"module": "preserve"
 	},
 	"include": [ "./src" ]
 }

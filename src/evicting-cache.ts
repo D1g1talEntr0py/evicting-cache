@@ -51,7 +51,7 @@ export class EvictingCache<K, V> {
 	 * @param key The key to check.
 	 * @returns True if the key is in the cache, false otherwise.
 	 */
-	has(key: K) {
+	has(key: K): boolean {
 		return this.cache.has(key);
 	}
 
@@ -63,7 +63,7 @@ export class EvictingCache<K, V> {
 	 * @param value The value to add.
 	 * @returns void
 	 */
-	put(key: K, value: V) {
+	put(key: K, value: V): void {
 		this.putAndEvict(key, value);
 	}
 
@@ -73,7 +73,7 @@ export class EvictingCache<K, V> {
 	 * @param key The key to remove.
 	 * @returns True if the key was in the cache and was removed, false otherwise.
 	 */
-	delete(key: K) {
+	delete(key: K): boolean {
 		return this.cache.delete(key);
 	}
 
@@ -95,7 +95,7 @@ export class EvictingCache<K, V> {
 	 * @param producer The value to put if the key does not exist in the cache.
 	 * @returns The value corresponding to the key.
 	 */
-	getOrPut(key: K, producer: () => V) {
+	getOrPut(key: K, producer: () => V): V {
 		const existing = this.get(key);
 		if (existing !== null) { return existing }
 
@@ -108,7 +108,7 @@ export class EvictingCache<K, V> {
 	 * Removes the least recently used key-value pair from the cache.
 	 * @returns True if an item was removed, false otherwise.
 	 */
-	evict() {
+	evict(): boolean {
 		const firstEntry = this.cache.keys().next();
 		if (firstEntry.done) { return false }
 
@@ -127,7 +127,7 @@ export class EvictingCache<K, V> {
 	 * @param callbackfn Function to execute for each element.
 	 * @param thisArg Value to use as `this` when executing callback.
 	 */
-	forEach(callbackfn: (value: V, key: K, cache: EvictingCache<K, V>) => void, thisArg?: unknown) {
+	forEach(callbackfn: (value: V, key: K, cache: EvictingCache<K, V>) => void, thisArg?: unknown): void {
 		const boundCallback = thisArg !== undefined ? callbackfn.bind(thisArg) : callbackfn;
 		this.cache.forEach((value, key) => boundCallback(value, key, this));
 	}
@@ -137,7 +137,7 @@ export class EvictingCache<K, V> {
 	 * Each pair is added individually, following the same LRU eviction rules as put().
 	 * @param entries The entries to add.
 	 */
-	putAll(entries: Iterable<[K, V]>) {
+	putAll(entries: Iterable<[K, V]>): void {
 		for (const [key, value] of entries) { this.put(key, value) }
 	}
 
@@ -148,7 +148,7 @@ export class EvictingCache<K, V> {
 	 * @param keys The keys to get values for.
 	 * @returns A map of keys to their values (excludes missing keys).
 	 */
-	getAll(keys: Iterable<K>) {
+	getAll(keys: Iterable<K>): Map<K, V> {
 		const result = new Map<K, V>();
 		for (const key of keys) {
 			const value = this.get(key);
@@ -164,7 +164,7 @@ export class EvictingCache<K, V> {
 	 * @param keys The keys to remove.
 	 * @returns The number of keys that were removed.
 	 */
-	deleteAll(keys: Iterable<K>) {
+	deleteAll(keys: Iterable<K>): number {
 		let count = 0;
 		for (const key of keys) {
 			if (this.cache.delete(key)) { count++ }
@@ -187,7 +187,7 @@ export class EvictingCache<K, V> {
 	/**
 	 * Resets cache statistics to zero.
 	 */
-	resetStats() {
+	resetStats(): void {
 		this.hits = 0;
 		this.misses = 0;
 	}
@@ -200,7 +200,7 @@ export class EvictingCache<K, V> {
 	 * @readonly
 	 * @returns The capacity of the cache.
 	 */
-	get capacity() {
+	get capacity(): number {
 		return this._capacity;
 	}
 
@@ -214,7 +214,7 @@ export class EvictingCache<K, V> {
 	 *
 	 * @returns The size of the cache.
 	 */
-	get size() {
+	get size(): number {
 		return this.cache.size;
 	}
 
@@ -224,7 +224,7 @@ export class EvictingCache<K, V> {
 	 *
 	 * @returns An iterator over the keys in the cache.
 	 */
-	keys() {
+	keys(): IterableIterator<K> {
 		return this.cache.keys();
 	}
 
@@ -234,7 +234,7 @@ export class EvictingCache<K, V> {
 	 *
 	 * @returns An iterator over the values in the cache.
 	 */
-	values() {
+	values(): IterableIterator<V> {
 		return this.cache.values();
 	}
 
@@ -244,7 +244,7 @@ export class EvictingCache<K, V> {
 	 *
 	 * @returns An iterator over the entries in the cache.
 	 */
-	entries() {
+	entries(): IterableIterator<[K, V]> {
 		return this.cache.entries();
 	}
 
@@ -254,7 +254,7 @@ export class EvictingCache<K, V> {
 	 *
 	 * @returns An iterator over the entries in the cache.
 	 */
-	[Symbol.iterator]() {
+	[Symbol.iterator](): IterableIterator<[K, V]> {
 		return this.entries();
 	}
 
@@ -264,7 +264,7 @@ export class EvictingCache<K, V> {
 	 * @override
 	 * @returns The description of the object.
 	 */
-	get [Symbol.toStringTag]() {
+	get [Symbol.toStringTag](): string {
 		return 'EvictingCache';
 	}
 
