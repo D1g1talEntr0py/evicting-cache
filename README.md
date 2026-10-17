@@ -262,7 +262,7 @@ Compatible with all modern browsers and Node.js environments that support ES2015
 - Chrome/Edge: ✅ Latest
 - Firefox: ✅ Latest
 - Safari: ✅ 15+
-- Node.js: ✅ 14+
+- Node.js: ✅ 20.16+
 
 ## License
 
@@ -271,6 +271,8 @@ ISC License - See [LICENSE](LICENSE) file for details
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
+
+Use Conventional Commits. Features trigger minor releases; fixes, performance improvements, and reverts trigger patch releases; breaking conventional commits trigger major releases. Other commits, including refactors, are included in the changelog but do not independently trigger a release. See the [release process](docs/release-process.md) for validation and automated git-cliff publishing details.
 
 ## Changelog
 

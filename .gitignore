@@ -18,4 +18,5 @@ node_modules
 
 tests/coverage/
 benchmark/
-docs/
+docs/*
+!docs/release-process.md
