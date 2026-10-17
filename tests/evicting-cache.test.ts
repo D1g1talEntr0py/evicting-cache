@@ -1,5 +1,5 @@
 import { EvictingCache } from '../src/evicting-cache';
-import { describe, test, expect, beforeEach } from 'vitest';
+import { describe, test, expect, beforeEach, vi } from 'vitest';
 
 describe('EvictingCache', () => {
 	test('constructor', () => {
@@ -140,6 +140,18 @@ describe('EvictingCache', () => {
 		expect(cache.get('a')).toBe(null);
 		expect(cache.get(null)).toBe(null);
 		expect(cache.get(undefined)).toBe(null);
+	});
+
+	test('get supports undefined values and updates LRU order', () => {
+		const cache = new EvictingCache<string, number | undefined>(2);
+		cache.put('a', undefined);
+		cache.put('b', 2);
+
+		expect(cache.get('a')).toBeUndefined();
+		expect(cache.getStats()).toEqual({ hits: 1, misses: 0, hitRate: 1 });
+
+		cache.put('c', 3);
+		expect([...cache.keys()]).toEqual(['a', 'c']);
 	});
 
 	test('evict with empty cache', () => {
@@ -566,6 +578,20 @@ describe('EvictingCache', () => {
 				const result = cache.getAll(keys);
 				expect(result.size).toBe(2);
 			});
+
+			test('preserves undefined values', () => {
+				const cache = new EvictingCache<string, number | undefined>(3);
+				cache.put('a', undefined);
+				cache.put('b', 2);
+
+				const result = cache.getAll(['a', 'c']);
+
+				expect(result.size).toBe(1);
+				expect(result.has('a')).toBe(true);
+				expect(result.get('a')).toBeUndefined();
+				expect(result.has('c')).toBe(false);
+				expect(cache.getStats()).toEqual({ hits: 1, misses: 1, hitRate: 0.5 });
+			});
 		});
 
 		describe('deleteAll', () => {
@@ -723,6 +749,16 @@ describe('EvictingCache', () => {
 	});
 
 	describe('getOrPut error handling', () => {
+		test('does not replace an existing null value', () => {
+			const cache = new EvictingCache<string, number | null>(2);
+			const producer = vi.fn(() => 1);
+			cache.put('a', null);
+
+			expect(cache.getOrPut('a', producer)).toBeNull();
+			expect(producer).not.toHaveBeenCalled();
+			expect(cache.getAll(['a'])).toEqual(new Map([['a', null]]));
+		});
+
 		test('does not modify cache when producer throws', () => {
 			const cache = new EvictingCache<string, number>(2);
 			cache.put('a', 1);

@@ -1,15 +1,14 @@
-type CacheStats = {
-	hits: number;
-	misses: number;
-	hitRate: number;
-};
+type Missing = typeof MISSING;
+type CacheStats = { hits: number, misses: number, hitRate: number };
+
+const MISSING = Symbol('missing');
 
 /** JavaScript implementation of a Least Recently Used(LRU) Cache using a Map. */
 export class EvictingCache<K, V> {
-	private readonly _capacity: number;
-	private readonly cache: Map<K, V>;
-	private hits = 0;
-	private misses = 0;
+	#hits = 0;
+	#misses = 0;
+	readonly #capacity: number;
+	readonly #cache: Map<K, V>;
 
 	/**
 	 * Creates a new Evicting Cache with the given capacity.
@@ -18,10 +17,11 @@ export class EvictingCache<K, V> {
 	 */
 	constructor(capacity: number = 100) {
 		if (capacity < 1) { throw new RangeError('capacity must be greater than 0') }
+
 		if (!Number.isInteger(capacity)) { throw new RangeError('capacity must be an integer') }
 
-		this._capacity = capacity;
-		this.cache = new Map();
+		this.#capacity = capacity;
+		this.#cache = new Map();
 	}
 
 	/**
@@ -31,16 +31,15 @@ export class EvictingCache<K, V> {
 	 * @returns The associated value if the key is in the cache, or null otherwise.
 	 */
 	get(key: K): V | null {
-		const value = this.cache.get(key);
-		if (value === undefined) {
-			this.misses++;
+		const value = this.#read(key, true);
+
+		if (value === MISSING) {
+			this.#misses++;
+
 			return null;
 		}
 
-		this.hits++;
-		this.cache.delete(key);
-		// Move the accessed item to the end (most recently used)
-		this.cache.set(key, value);
+		this.#hits++;
 
 		return value;
 	}
@@ -52,7 +51,7 @@ export class EvictingCache<K, V> {
 	 * @returns True if the key is in the cache, false otherwise.
 	 */
 	has(key: K): boolean {
-		return this.cache.has(key);
+		return this.#cache.has(key);
 	}
 
 	/**
@@ -61,10 +60,9 @@ export class EvictingCache<K, V> {
 	 *
 	 * @param key The key to add.
 	 * @param value The value to add.
-	 * @returns void
 	 */
 	put(key: K, value: V): void {
-		this.putAndEvict(key, value);
+		this.#putAndEvict(key, value);
 	}
 
 	/**
@@ -74,7 +72,7 @@ export class EvictingCache<K, V> {
 	 * @returns True if the key was in the cache and was removed, false otherwise.
 	 */
 	delete(key: K): boolean {
-		return this.cache.delete(key);
+		return this.#cache.delete(key);
 	}
 
 	/**
@@ -84,7 +82,9 @@ export class EvictingCache<K, V> {
 	 * @returns The associated value if the key is in the cache, or null otherwise.
 	 */
 	peek(key: K): V | null {
-		return this.cache.get(key) ?? null;
+		const value = this.#read(key, false);
+
+		return value === MISSING ? null : value;
 	}
 
 	/**
@@ -96,12 +96,20 @@ export class EvictingCache<K, V> {
 	 * @returns The value corresponding to the key.
 	 */
 	getOrPut(key: K, producer: () => V): V {
-		const existing = this.get(key);
-		if (existing !== null) { return existing }
+		const existing = this.#read(key, true);
+
+		if (existing !== MISSING) {
+			this.#hits++;
+
+			return existing;
+		}
+
+		this.#misses++;
 
 		// If producer throws, cache state remains unchanged
 		const value = producer();
-		return this.putAndEvict(key, value);
+
+		return this.#putAndEvict(key, value);
 	}
 
 	/**
@@ -109,17 +117,16 @@ export class EvictingCache<K, V> {
 	 * @returns True if an item was removed, false otherwise.
 	 */
 	evict(): boolean {
-		const firstEntry = this.cache.keys().next();
-		if (firstEntry.done) { return false }
+		const firstEntry = this.#cache.keys().next();
 
-		return this.cache.delete(firstEntry.value);
+		return firstEntry.done ? false : this.#cache.delete(firstEntry.value);
 	}
 
 	/**
 	 * Clears the cache and the LRU list.
 	 */
 	clear(): void {
-		this.cache.clear();
+		this.#cache.clear();
 	}
 
 	/**
@@ -129,7 +136,7 @@ export class EvictingCache<K, V> {
 	 */
 	forEach(callbackfn: (value: V, key: K, cache: EvictingCache<K, V>) => void, thisArg?: unknown): void {
 		const boundCallback = thisArg !== undefined ? callbackfn.bind(thisArg) : callbackfn;
-		this.cache.forEach((value, key) => boundCallback(value, key, this));
+		this.#cache.forEach((value, key) => boundCallback(value, key, this));
 	}
 
 	/**
@@ -151,8 +158,16 @@ export class EvictingCache<K, V> {
 	getAll(keys: Iterable<K>): Map<K, V> {
 		const result = new Map<K, V>();
 		for (const key of keys) {
-			const value = this.get(key);
-			if (value !== null) { result.set(key, value) }
+			const value = this.#read(key, true);
+
+			if (value === MISSING) {
+				this.#misses++;
+
+				continue;
+			}
+
+			this.#hits++;
+			result.set(key, value);
 		}
 
 		return result;
@@ -166,8 +181,9 @@ export class EvictingCache<K, V> {
 	 */
 	deleteAll(keys: Iterable<K>): number {
 		let count = 0;
+
 		for (const key of keys) {
-			if (this.cache.delete(key)) { count++ }
+			if (this.#cache.delete(key)) { count++ }
 		}
 
 		return count;
@@ -179,17 +195,17 @@ export class EvictingCache<K, V> {
 	 * @returns Cache statistics.
 	 */
 	getStats(): CacheStats {
-		const total = this.hits + this.misses;
+		const total = this.#hits + this.#misses;
 
-		return { hits: this.hits, misses: this.misses, hitRate: total === 0 ? 0 : this.hits / total };
+		return { hits: this.#hits, misses: this.#misses, hitRate: total === 0 ? 0 : this.#hits / total };
 	}
 
 	/**
 	 * Resets cache statistics to zero.
 	 */
 	resetStats(): void {
-		this.hits = 0;
-		this.misses = 0;
+		this.#hits = 0;
+		this.#misses = 0;
 	}
 
 	/**
@@ -197,11 +213,10 @@ export class EvictingCache<K, V> {
 	 * This is the maximum number of key-value pairs the cache can hold.
 	 * This is not the number of key-value pairs in the cache.
 	 *
-	 * @readonly
 	 * @returns The capacity of the cache.
 	 */
 	get capacity(): number {
-		return this._capacity;
+		return this.#capacity;
 	}
 
 	/**
@@ -215,7 +230,7 @@ export class EvictingCache<K, V> {
 	 * @returns The size of the cache.
 	 */
 	get size(): number {
-		return this.cache.size;
+		return this.#cache.size;
 	}
 
 	/**
@@ -225,7 +240,7 @@ export class EvictingCache<K, V> {
 	 * @returns An iterator over the keys in the cache.
 	 */
 	keys(): IterableIterator<K> {
-		return this.cache.keys();
+		return this.#cache.keys();
 	}
 
 	/**
@@ -235,7 +250,7 @@ export class EvictingCache<K, V> {
 	 * @returns An iterator over the values in the cache.
 	 */
 	values(): IterableIterator<V> {
-		return this.cache.values();
+		return this.#cache.values();
 	}
 
 	/**
@@ -245,7 +260,7 @@ export class EvictingCache<K, V> {
 	 * @returns An iterator over the entries in the cache.
 	 */
 	entries(): IterableIterator<[K, V]> {
-		return this.cache.entries();
+		return this.#cache.entries();
 	}
 
 	/**
@@ -261,7 +276,6 @@ export class EvictingCache<K, V> {
 	/**
 	 * Gets the description of the object.
 	 *
-	 * @override
 	 * @returns The description of the object.
 	 */
 	get [Symbol.toStringTag](): string {
@@ -276,11 +290,34 @@ export class EvictingCache<K, V> {
 	 * @param value The value to put.
 	 * @returns The value that was put.
 	 */
-	private putAndEvict(key: K, value: V) {
-		const existed = this.cache.delete(key);
-		if (!existed && this._capacity <= this.cache.size) { this.evict() }
+	#putAndEvict(key: K, value: V) {
+		const existed = this.#cache.delete(key);
 
-		this.cache.set(key, value);
+		if (!existed && this.#capacity <= this.#cache.size) { this.evict() }
+
+		this.#cache.set(key, value);
+
+		return value;
+	}
+
+	/**
+	 * Reads a value from the cache and optionally updates its LRU position.
+	 *
+	 * @param key The key to read.
+	 * @param updateRecency Whether to move the key to the most recently used position.
+	 * @returns The cached value, or a sentinel when the key is missing.
+	 */
+	#read(key: K, updateRecency: boolean): V | Missing {
+		const value = this.#cache.get(key) as V;
+
+		// If the value is undefined, check if the key is actually missing from the cache before assuming it's a cache miss.
+		if (value === undefined && !this.#cache.has(key)) { return MISSING }
+
+		if (updateRecency) {
+			this.#cache.delete(key);
+			// Move the accessed item to the end (most recently used)
+			this.#cache.set(key, value);
+		}
 
 		return value;
 	}
