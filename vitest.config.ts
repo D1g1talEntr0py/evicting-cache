@@ -10,7 +10,13 @@ export default defineConfig({
 		},
 		environment: 'node',
 		typecheck: { enabled: false },
-		coverage: { reporter: [ 'lcov', 'text' ], reportsDirectory: 'tests/coverage', include: [ 'src' ], exclude: [ 'src/index.ts' ] },
+		coverage: {
+			reporter: [ 'lcov', 'text' ],
+			reportsDirectory: 'tests/coverage',
+			include: [ 'src' ],
+			exclude: [ 'src/index.ts' ],
+			thresholds: { statements: 100, branches: 100, functions: 100, lines: 100 }
+		},
 		outputFile: 'coverage/sonar-report.xml'
 	},
 	resolve: {

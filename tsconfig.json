@@ -1,17 +1,18 @@
 {
 	"compilerOptions": {
+		"target": "ES2024",
+		"outDir": "./dist",
+		"strict": true,
 		"sourceMap": true,
 		"declaration": true,
-		"isolatedDeclarations": true,
-		"isolatedModules": true,
+		"verbatimModuleSyntax": true,
 		"allowUnusedLabels": false,
 		"allowUnreachableCode": false,
 		"noImplicitOverride": true,
 		"noImplicitReturns": true,
-		"stableTypeOrdering": true,
 		"noUncheckedIndexedAccess": true,
 		"rootDir": "./src",
-		"lib": [ "ESNext", "DOM" ],
+		"lib": [ "ES2024", "DOM" ],
 		"module": "preserve"
 	},
 	"include": [ "./src" ]

@@ -21,7 +21,7 @@
   "engines": {
     "node": ">=20.16.0"
   },
-  "packageManager": "pnpm@10.33.0",
+  "packageManager": "pnpm@12.14.0",
   "publishConfig": {
     "registry": "https://registry.npmjs.org",
     "access": "public"
@@ -41,35 +41,31 @@
     "LICENSE"
   ],
   "scripts": {
-    "build": "tsbuild",
-    "build:watch": "tsbuild --watch",
-    "type-check": "tsbuild --noEmit",
-    "lint": "eslint ./src",
+    "build": "tsc && terser dist/evicting-cache.js --module --compress --mangle --output dist/evicting-cache.js --source-map \"content='dist/evicting-cache.js.map',url='evicting-cache.js.map'\"",
+    "build:watch": "tsc --watch",
+    "type-check": "tsc --noEmit",
+    "lint": "eslint --flag unstable_native_nodejs_ts_config ./src",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
     "test:watch": "vitest"
   },
   "devDependencies": {
-    "@d1g1tal/tsbuild": "^1.7.5",
-    "@eslint/compat": "^2.0.4",
+    "@eslint/compat": "^2.1.1",
     "@eslint/js": "^10.0.1",
-    "@types/eslint": "^9.6.1",
-    "@types/node": "^25.5.2",
-    "@typescript-eslint/eslint-plugin": "^8.58.0",
-    "@typescript-eslint/parser": "^8.58.0",
-    "@vitest/coverage-v8": "^4.1.3",
-    "eslint": "^10.2.0",
-    "eslint-plugin-compat": "^7.0.1",
-    "eslint-plugin-jsdoc": "^62.9.0",
-    "globals": "^17.4.0",
-    "typescript": "^6.0.2",
-    "typescript-eslint": "^8.58.0",
-    "vitest": "^4.1.3"
+    "@types/node": "^26.6.5",
+    "@typescript/native": "npm:typescript@^7.0.2",
+    "@vitest/coverage-v8": "^5.0.5",
+    "eslint": "^10.13.0",
+    "eslint-plugin-compat": "^7.0.2",
+    "eslint-plugin-jsdoc": "^65.3.8",
+    "terser": "^5.51.2",
+    "typescript": "npm:@typescript/typescript6@^6.0.2",
+    "typescript-eslint": "^8.71.2",
+    "vitest": "^5.0.5"
   },
   "browserslist": [
-    "defaults",
-    "not ios_saf < 15",
-    "not op_mini all"
+    "defaults and fully supports es6",
+    "maintained node versions"
   ],
   "keywords": [
     "cache",
